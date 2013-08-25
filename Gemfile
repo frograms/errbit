@@ -99,6 +99,7 @@ end
 
 group :development do
   gem 'capistrano'
+  gem 'capistrano-unicorn', require: false
 
   # better errors
   gem 'better_errors'    , :platform => :ruby_19
