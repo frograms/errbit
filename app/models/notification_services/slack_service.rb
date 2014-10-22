@@ -17,6 +17,10 @@ class NotificationServices::SlackService < NotificationService
     end
   end
 
+  def url
+    webhook_url
+  end
+
   def message_for_slack(problem)
     "[#{problem.app.name}][#{problem.environment}][#{problem.where}]: #{problem.error_class} <#{problem_url(problem)}|Show>"
   end
