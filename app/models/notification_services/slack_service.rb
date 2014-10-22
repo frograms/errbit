@@ -1,13 +1,9 @@
 class NotificationServices::SlackService < NotificationService
   Label = "slack"
   Fields += [
-    [:subdomain, {
-      :placeholder => 'subdomain',
-      :label => 'Subdomain portion for Slack service'
-    }],
-    [:api_token, {
-      :placeholder => 'Slack Integration Token',
-      :label => 'Token'
+    [:webhook_url, {
+      :placeholder => 'URL',
+      :label => 'Slack Incoming Webhook URL'
     }],
     [:room_id, {
       :placeholder => '#general',
@@ -17,16 +13,12 @@ class NotificationServices::SlackService < NotificationService
 
   def check_params
     if Fields.detect {|f| self[f[0]].blank? unless f[0] == :room_id }
-      errors.add :base, "You must specify your Slack subdomain and token."
+      errors.add :base, "You must specify your Slack Incoming Webhook URL."
     end
   end
 
-  def url
-    "https://#{subdomain}.slack.com/services/hooks/incoming-webhook?token=#{api_token}"
-  end
-
   def message_for_slack(problem)
-    "[#{problem.app.name}][#{problem.environment}][#{problem.where}]: #{problem.error_class} #{problem_url(problem)}"
+    "[#{problem.app.name}][#{problem.environment}][#{problem.where}]: #{problem.error_class} <#{problem_url(problem)}|Show>"
   end
 
   def post_payload(problem)
@@ -36,6 +28,6 @@ class NotificationServices::SlackService < NotificationService
   end
 
   def create_notification(problem)
-    HTTParty.post(url, :body => post_payload(problem), :headers => { 'Content-Type' => 'application/json' })
+    HTTParty.post(webhook_url, :body => post_payload(problem), :headers => { 'Content-Type' => 'application/json' })
   end
 end
