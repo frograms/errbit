@@ -9,6 +9,7 @@ class App
   field :bitbucket_repo
   field :asset_host
   field :repository_branch
+  field :current_app_version
   field :resolve_errs_on_deploy, :type => Boolean, :default => false
   field :notify_all_users, :type => Boolean, :default => false
   field :notify_on_errs, :type => Boolean, :default => true
@@ -16,7 +17,12 @@ class App
   field :email_at_notices, :type => Array, :default => Errbit::Config.email_at_notices
 
   # Some legacy apps may have string as key instead of BSON::ObjectID
-  identity :type => String
+  # identity :type => String
+  field :_id,
+    type: String,
+    pre_processed: true,
+    default: ->{ Moped::BSON::ObjectId.new.to_s }
+
 
   embeds_many :watchers
   embeds_many :deploys
@@ -61,7 +67,7 @@ class App
   end
 
   def self.find_by_api_key!(key)
-    where(:api_key => key).first || raise(Mongoid::Errors::DocumentNotFound.new(self,key))
+    find_by(:api_key => key)
   end
 
   def last_deploy_at
@@ -93,7 +99,7 @@ class App
   end
 
   def github_url
-    "https://github.com/#{github_repo}" if github_repo?
+    "#{Errbit::Config.github_url}/#{github_repo}" if github_repo?
   end
 
   def github_url_to_file(file)
@@ -165,6 +171,10 @@ class App
     Errbit::Config.per_app_email_at_notices ? super : Errbit::Config.email_at_notices
   end
 
+  def regenerate_api_key!
+    set(:api_key, SecureRandom.hex)
+  end
+
   protected
 
     def store_cached_attributes_on_problems
@@ -186,8 +196,10 @@ class App
 
     def normalize_github_repo
       return if github_repo.blank?
+      github_host = URI.parse(Errbit::Config.github_url).host
+      github_host = Regexp.escape(github_host)
       github_repo.strip!
-      github_repo.sub!(/(git@|https?:\/\/)github\.com(\/|:)/, '')
+      github_repo.sub!(/(git@|https?:\/\/)#{github_host}(\/|:)/, '')
       github_repo.sub!(/\.git$/, '')
     end
 end

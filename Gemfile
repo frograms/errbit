@@ -1,11 +1,15 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
-gem 'rails', '3.2.13'
-gem 'mongoid', '~> 2.7.1'
+RAILS_VERSION = '~> 3.2.19'
 
-# Mongoid rails migration > 0.0.14 is not compatible to Mongoid 2.x
-gem 'mongoid_rails_migrations', '~> 0.0.14'
-gem 'devise', '~> 2.2.6' # Last version supporting ruby 1.8.7
+gem 'actionmailer', RAILS_VERSION
+gem 'actionpack', RAILS_VERSION
+gem 'railties', RAILS_VERSION
+
+gem 'mongoid'
+
+gem 'mongoid_rails_migrations'
+gem 'devise'
 gem 'haml'
 gem 'htmlentities'
 gem 'rack-ssl', :require => 'rack/ssl'   # force SSL
@@ -13,12 +17,10 @@ gem 'rack-ssl', :require => 'rack/ssl'   # force SSL
 gem 'useragent'
 gem 'decent_exposure'
 gem 'strong_parameters'
-gem 'SystemTimer', :platform => :ruby_18
 gem 'actionmailer_inline_css'
 gem 'kaminari', '>= 0.14.1'
 gem 'rack-ssl-enforcer', :require => false
-# fabrication 1.3.0 is last supporting ruby 1.8. Update when stop supporting this version too
-gem 'fabrication', "~> 1.3.0"   # Used for both tests and demo data
+gem 'fabrication'
 gem 'rails_autolink'
 # Please don't update hoptoad_notifier to airbrake.
 # It's for internal use only, and we monkeypatch certain methods
@@ -39,24 +41,19 @@ gem 'pivotal-tracker'
 # Fogbugz
 gem 'ruby-fogbugz', :require => 'fogbugz'
 # Github Issues
-gem 'octokit'
+gem 'octokit', '~> 2.0'
 # Gitlab
-gem 'gitlab', :git => 'https://github.com/NARKOZ/gitlab.git'
+gem 'gitlab', '~> 3.0.0'
 
 # Bitbucket Issues
 gem 'bitbucket_rest_api', :require => false
-
-# Unfuddle
-gem "taskmapper", "~> 0.8.0"
-gem "taskmapper-unfuddle", "~> 0.7.0"
 
 # Jira
 gem 'jira-ruby', :require => 'jira'
 
 # Notification services
 # ---------------------------------------
-# Campfire ( We can't upgrade to 1.0 because drop support of ruby 1.8
-gem 'campy', '0.1.3'
+gem 'campy'
 # Hipchat
 gem 'hipchat'
 # Google Talk
@@ -75,22 +72,13 @@ gem 'flowdock'
 # GitHub OAuth
 gem 'omniauth-github'
 
-
-platform :ruby do
-  gem 'mongo'
-  gem 'bson'
-  gem 'bson_ext'
-end
-
 gem 'ri_cal'
 gem 'yajl-ruby', :require => "yajl"
 
 group :development, :test do
-  gem 'rspec-rails', '~> 2.6'
+  gem 'rspec-rails'
   gem 'webmock', :require => false
   gem 'airbrake', :require => false
-  gem 'ruby-debug', :platform => :mri_18
-  gem 'debugger', :platform => :mri_19
   gem 'pry-rails'
 #  gem 'rpm_contrib'
 #  gem 'newrelic_rpm'
@@ -98,33 +86,31 @@ group :development, :test do
 end
 
 group :development do
-  gem 'capistrano'
-  gem 'capistrano-unicorn', require: false
+  gem 'capistrano', '~> 2.0', :require => false
 
   # better errors
-  gem 'better_errors'    , :platform => :ruby_19
-  gem 'binding_of_caller', :platform => :ruby_19
-  gem 'meta_request'     , :platform => :ruby_19
-  gem 'foreman'
+  gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'meta_request'
+  gem 'foreman', :require => false
 
-  # Use thin for development
-  gem 'thin', :group => :development, :platform => :ruby
+  # Use puma for development
+  gem 'puma', :require => false
 
 end
 
 group :test do
-  # Capybara 2.1.0 no more support 1.8.7 ruby version
-  gem 'capybara', "~> 2.0.1"
+  gem 'capybara'
   gem 'launchy'
-  # DatabaseCleaner 1.0.0 drop the support of ruby 1.8.7
-  gem 'database_cleaner', '~> 0.9.0'
+  gem 'database_cleaner'
   gem 'email_spec'
-  gem 'timecop', '0.6.1' # last version compatible to ruby 1.8
+  gem 'timecop'
   gem 'coveralls', :require => false
+  gem 'mongoid-rspec', :require => false
 end
 
 group :heroku, :production do
-  gem 'unicorn'
+  gem 'unicorn', :require => false
 end
 
 
