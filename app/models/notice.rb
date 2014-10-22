@@ -16,15 +16,9 @@ class Notice
 
   belongs_to :err
   belongs_to :backtrace, :index => true
-  index :created_at
 
-  index(
-    [
-      [ :err_id, Mongo::ASCENDING ],
-      [ :created_at, Mongo::ASCENDING ],
-      [ :_id, Mongo::ASCENDING ]
-    ]
-  )
+  index(:created_at => 1)
+  index(:err_id => 1, :created_at => 1, :_id => 1)
 
   after_create :cache_attributes_on_problem, :unresolve_problem
   after_create :email_notification
@@ -84,6 +78,17 @@ class Notice
     "N/A"
   end
 
+  def to_curl
+    return "N/A" if url.blank?
+    headers = %w(Accept Accept-Encoding Accept-Language Cookie Referer User-Agent).each_with_object([]) do |name, h|
+      if value = env_vars["HTTP_#{name.underscore.upcase}"]
+        h << "-H '#{name}: #{value}'"
+      end
+    end
+
+    "curl -X #{env_vars['REQUEST_METHOD'] || 'GET'} #{headers.join(' ')} #{url}"
+  end
+
   def env_vars
     request['cgi-data'] || {}
   end
@@ -122,6 +127,12 @@ class Notice
   def project_root
     if server_environment
       server_environment['project-root'] || ''
+    end
+  end
+
+  def app_version
+    if server_environment
+      server_environment['app-version'] || ''
     end
   end
 

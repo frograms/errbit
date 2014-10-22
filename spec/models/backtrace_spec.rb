@@ -11,7 +11,12 @@ describe Backtrace do
     end
 
     context "similar backtrace exist" do
-      let!(:similar_backtrace) { Fabricate(:backtrace, :fingerprint => fingerprint) }
+      let!(:similar_backtrace) {
+        b =  Fabricate(:backtrace)
+        b.fingerprint = fingerprint
+        b.save!
+        b
+      }
       let(:fingerprint) { "fingerprint" }
 
       before { subject.stub(:fingerprint => fingerprint) }
@@ -30,7 +35,7 @@ describe Backtrace do
     context "no similar backtrace" do
       before { backtrace.stub(:similar => nil) }
       it "create new backtrace" do
-        described_class.should_receive(:create).with(attributes)
+        expect(described_class).to receive(:create).with(attributes)
 
         described_class.find_or_create(attributes)
       end
