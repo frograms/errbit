@@ -1,7 +1,7 @@
 class NotificationServices::SlackService < NotificationService
   Label = "slack"
   Fields += [
-    [:webhook_url, {
+    [:api_token, {
       :placeholder => 'URL',
       :label => 'Slack Incoming Webhook URL'
     }],
@@ -18,7 +18,7 @@ class NotificationServices::SlackService < NotificationService
   end
 
   def url
-    webhook_url
+    api_token
   end
 
   def message_for_slack(problem)
@@ -32,6 +32,6 @@ class NotificationServices::SlackService < NotificationService
   end
 
   def create_notification(problem)
-    HTTParty.post(webhook_url, :body => post_payload(problem), :headers => { 'Content-Type' => 'application/json' })
+    HTTParty.post(url, :body => post_payload(problem), :headers => { 'Content-Type' => 'application/json' })
   end
 end
