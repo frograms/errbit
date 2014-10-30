@@ -21,12 +21,38 @@ class NotificationServices::SlackService < NotificationService
     api_token
   end
 
-  def message_for_slack(problem)
+  def message_for_slack(msg)
+    {
+      "fallback" => fallback_message_for_hubot,
+      "pretext" => "#{problem.app.name}(#{problem.environment}) - #{problem.err_class} <#{problem_url(problem)}|자세히 보기>",
+      "color" => "#FF0000",
+      "fields" =>
+      [
+       {
+         "title" => "Where",
+         "value" => "#{problem.where}",
+         "short" => true
+       },
+       {
+         "title" => "Count",
+         "value" => problem.notices_count,
+         "short" => true
+       },
+       {
+         "title" => "Message",
+         "value" => problem.message,
+         "short" => false
+       },
+      ]
+    }
+  end
+
+  def fallback_message_for_slack(problem)
     "[#{problem.app.name}][#{problem.environment}][#{problem.where}]: #{problem.error_class} <#{problem_url(problem)}|Show>"
   end
 
   def post_payload(problem)
-    payload = {:text => message_for_slack(problem) }
+    payload = {:attachments => [message_for_slack(problem)] }
     payload[:channel] = room_id unless room_id.empty?
     payload.to_json
   end
