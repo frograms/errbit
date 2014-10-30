@@ -21,10 +21,10 @@ class NotificationServices::SlackService < NotificationService
     api_token
   end
 
-  def message_for_slack(msg)
+  def message_for_slack(problem)
     {
-      "fallback" => fallback_message_for_hubot,
-      "pretext" => "#{problem.app.name}(#{problem.environment}) - #{problem.err_class} <#{problem_url(problem)}|자세히 보기>",
+      "fallback" => fallback_message_for_problem,
+      "pretext" => "#{problem.app.name}(#{problem.environment}) - #{problem.error_class} <#{problem_url(problem)}|Show>",
       "color" => "#FF0000",
       "fields" =>
       [
